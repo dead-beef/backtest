@@ -1,0 +1,12 @@
+/env
+/in
+/out
+/build
+/dist
+/*.egg-info
+__pycache__
+*.pyc
+/data
+/strategies/*
+!/strategies/.pylintrc
+!/strategies/buy_and_hold.py
