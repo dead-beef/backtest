@@ -88,12 +88,12 @@ class ArrayDataSource(DataSource):
             step = interval // self.data_tick_size
             offset = (tick * self.tick_multiplier) % step
 
-        start = self.tick_offset + tick * self.tick_multiplier - offset
+        start = self.tick_offset + tick * self.tick_multiplier
 
         if start < 0:
             raise IndexError('tick {0} out of range'.format(tick))
 
-        return start, step
+        return start, step, offset
 
     def _merge(self, data, dst):
         dst[self.CANDLE.high] = max(data[:, self.CANDLE.high])
@@ -102,7 +102,8 @@ class ArrayDataSource(DataSource):
         dst[self.CANDLE.close] = data[-1, self.CANDLE.close]
 
     def get_current(self, tick, dataset, interval=None):
-        start, step = self._get_current(dataset, tick, interval)
+        start, step, offset = self._get_current(dataset, tick, interval)
+        start -= offset
         if step == 1:
             return self.data[dataset][start]
         else:
@@ -112,7 +113,8 @@ class ArrayDataSource(DataSource):
             return ret
 
     def get_prev(self, tick, length, dataset, interval=None):
-        end, step = self._get_current(dataset, tick, interval)
+        end, step, _ = self._get_current(dataset, tick, interval)
+        #end += 1
         start = end - length * step
 
         if start < 0:
@@ -126,7 +128,7 @@ class ArrayDataSource(DataSource):
         else:
             data = self.data[dataset][start:end]
             data = np.split(data, length)
-            ret = np.empty((length, self.CANDLE_SIZE), dtype=data[0].dtype)
+            ret = np.empty((len(data), self.CANDLE_SIZE), dtype=data[0].dtype)
             for i, interval in enumerate(data):
                 self._merge(interval, ret[i])
 
@@ -143,8 +145,8 @@ class ArrayDataSource(DataSource):
         if ticks <= 0 or ticks > max_ticks:
             raise ValueError('invalid tick count {0}'.format(ticks))
 
-        start, step = self._get_current(dataset, 0, None)
-        start += step - 1
+        start, step, offset = self._get_current(dataset, 0, None)
+        start += step - 1 - offset
         end = start + step * ticks
 
         return self.data[dataset][start:end:step, self.CANDLE.close]

@@ -167,11 +167,11 @@ class TestArrayDataSource(TestCase):
         )
         assert_array_equal(
             src.get_prev(7, 3, 'dataset0', interval=4),
-            [[4, 1, 2, 7], [12, 9, 10, 15], [20, 17, 18, 23]]
+            [[8, 5, 6, 11], [16, 13, 14, 19], [24, 21, 22, 27]]
         )
         assert_array_equal(
             src.get_prev(5, 1, 'dataset0', interval=6),
-            [[8, 1, 2, 11]]
+            [[16, 9, 10, 19]]
         )
 
     def testGetPrevError(self):
