@@ -5,6 +5,8 @@ class DataSource(object):
     CANDLE_SIZE = len(CANDLE_VALUES)
     CANDLE = enum(CANDLE_VALUES)
 
+    CANDLE.mean = CANDLE.high ##
+
     def __init__(self, start_time=None, tick_size=None):
         if start_time is None or tick_size is None:
             self.start_time = start_time

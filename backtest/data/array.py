@@ -101,6 +101,9 @@ class ArrayDataSource(DataSource):
         dst[self.CANDLE.open] = data[0, self.CANDLE.open]
         dst[self.CANDLE.close] = data[-1, self.CANDLE.close]
 
+        dst[self.CANDLE.mean] = data[:, self.CANDLE.close].mean()
+        # dst[self.CANDLE.mean] = (dst[self.CANDLE.open] + dst[self.CANDLE.close]) / 2.0
+
     def get_current(self, tick, dataset, interval=None):
         start, step, offset = self._get_current(dataset, tick, interval)
         start -= offset

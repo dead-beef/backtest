@@ -123,7 +123,7 @@ class TradewaveAPI(PythonAPI):
         self.validate_order(pair, amount, price)
 
         dst, src = PAIR_CURRENCIES[pair]
-        price = self.data[pair].price
+        price = self.data[pair].close # self.data[pair].price
 
         if amount is None:
             if self.portfolio.next[src] == 0:
@@ -158,7 +158,7 @@ class TradewaveAPI(PythonAPI):
         self.validate_order(pair, amount, price)
 
         src, dst = PAIR_CURRENCIES[pair]
-        price = self.data[pair].price
+        price = self.data[pair].close # self.data[pair].price
 
         if amount is None:
             amount = self.portfolio.next[src]

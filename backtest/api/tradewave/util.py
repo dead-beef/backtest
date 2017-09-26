@@ -20,7 +20,7 @@ MAX_PERIOD = 250
 DATA = ['open', 'high', 'low', 'close', 'volume', 'trades', 'price']
 DATA_INDEX = [
     ds.CANDLE.open, ds.CANDLE.high, ds.CANDLE.low, ds.CANDLE.close,
-    ds.CANDLE.close, ds.CANDLE.close, ds.CANDLE.close
+    ds.CANDLE.close, ds.CANDLE.close, ds.CANDLE.mean # ds.CANDLE.close
 ]
 DATA_INDEX = Namespace((data, index) for data, index in zip(DATA, DATA_INDEX))
 
