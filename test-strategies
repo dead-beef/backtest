@@ -1,0 +1,76 @@
+#!/bin/bash
+
+usage()
+{
+    cat >&2 <<EOF
+Usage: $0 [-h] <strategy> [<strategy>...]
+
+Positional arguments:
+    <strategy>   strategies to test (default: strategies/*.py)
+
+Optional arguments:
+    -h           show this help message and exit
+EOF
+	exit 1
+}
+
+get_data_file() {
+    DATA_FILE="$(find "${DATA_DIR}" -maxdepth 1 -iname '*_1800.npz' \
+                 | sort | head -n 1)"
+}
+
+ENV_DIR=env
+DATA_DIR=data
+
+while getopts 'h' OPT; do
+	case "$OPT" in
+		h) usage ;;
+		\?) exit 1 ;;
+	esac
+done
+
+shift $((OPTIND - 1))
+
+declare -a STRATEGIES
+
+if (( $# > 0 )); then
+    STRATEGIES=("$@")
+else
+    IFS=$'\n' read -d '' -a STRATEGIES \
+       <<<"$(find strategies -maxdepth 1 -iname '*.py' | sort)"
+fi
+
+if [[ ! -d $ENV_DIR ]]; then
+    if ! (virtualenv "$ENV_DIR" \
+          && virtualenv --system-site-packages "$ENV_DIR" \
+          && source env/bin/activate \
+          && python2 setup.py install \
+         );
+    then
+        rm -rfv "$ENV_DIR"
+        exit 1
+    fi
+fi
+
+source env/bin/activate
+
+[[ -d $DATA_DIR ]] || mkdir -v "$DATA_DIR" || exit 1
+
+get_data_file
+
+if [[ -z $DATA_FILE ]]; then
+    echo 'Downloading test data'
+    python2 -m backtest.data get -s poloniex -p usdt_btc \
+                                 -b 2015-06-01 -e 2017-01-01 \
+                                 -i 30m -o "$DATA_DIR"
+    get_data_file
+    if [[ -z $DATA_FILE ]]; then
+        echo 'Download failed'
+        exit 1
+    fi
+fi
+
+python2 -m backtest -p btc_usd -P 1 0 \
+                    -b 2016-01-01 -e 2017-01-01 \
+                    -i 1h \
+                    "$DATA_FILE" "${STRATEGIES[@]}"
