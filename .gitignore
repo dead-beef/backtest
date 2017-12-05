@@ -11,3 +11,4 @@ __pycache__
 /strategies/*
 !/strategies/.pylintrc
 !/strategies/buy_and_hold.py
+!/strategies/ma.py
