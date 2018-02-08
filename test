@@ -3,13 +3,16 @@
 usage()
 {
     cat >&2 <<EOF
-Usage: $0 [-h] <strategy> [<strategy>...]
+Usage: $0 [-h] [-i <time>] [-b <date>] [-e <date>] <strategy> [<strategy>...]
 
 Positional arguments:
     <strategy>   strategies to test (default: strategies/*.py)
 
 Optional arguments:
-    -h           show this help message and exit
+    -h            show this help message and exit
+    -i <interval> set interval (default: 1h)
+    -b <date>     set start date (default: 2016-01-01)
+    -e <date>     set end date (default: 2017-01-01)
 EOF
 	exit 1
 }
@@ -22,9 +25,16 @@ get_data_file() {
 ENV_DIR=env
 DATA_DIR=data
 
-while getopts 'h' OPT; do
+INTERVAL=1h
+START=2016-01-01
+END=2017-01-01
+
+while getopts 'hi:b:e:' OPT; do
 	case "$OPT" in
 		h) usage ;;
+        i) INTERVAL="$OPTARG" ;;
+        b) START="$OPTARG" ;;
+        e) END="$OPTARG" ;;
 		\?) exit 1 ;;
 	esac
 done
@@ -71,6 +81,6 @@ if [[ -z $DATA_FILE ]]; then
 fi
 
 python2 -m backtest -p btc_usd -P 1 0 \
-                    -b 2016-01-01 -e 2017-01-01 \
-                    -i 1h \
+                    -b "$START" -e "$END" \
+                    -i "$INTERVAL" \
                     "$DATA_FILE" "${STRATEGIES[@]}"
