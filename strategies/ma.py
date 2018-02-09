@@ -16,7 +16,8 @@ def initialize():
         raise Stop()
     storage.pair = storage.pair.split('_')
 
-    storage.ma = [4, 8, 16]
+    #storage.ma = [4, 8, 16]
+    storage.ma = [2, 4]
     storage.max_ma_width = 10.0
     storage.min_price_diff = 0.5
 
